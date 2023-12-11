@@ -30,16 +30,19 @@ public class KafkaConfig {
 
     @Bean("kafkaListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory() {
+        //TODO: Add the dead letter topic configuration here
         ConcurrentKafkaListenerContainerFactory<Object, Object> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(new DefaultKafkaConsumerFactory(kafkaProps.consumerProps()));
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =
             new DeadLetterPublishingRecoverer(kafkaTemplate, (record, ex) -> {
                 log.info("Exception {} occurred sending the record to the error topic {}", ex.getMessage(), deadLetterTopic);
+
                 return new TopicPartition(deadLetterTopic, -1);
             });
+        //TODO: Add the error handler configuration here
         CommonErrorHandler errorHandler = new DefaultErrorHandler(deadLetterPublishingRecoverer, new FixedBackOff(0L, 1L));
-        concurrentKafkaListenerContainerFactory.setCommonErrorHandler(errorHandler);
+        concurrentKafkaListenerContainerFactory.setCommonErrorHandler(errorHandler);//set the error handler
         return concurrentKafkaListenerContainerFactory;
     }
 

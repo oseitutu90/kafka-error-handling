@@ -17,7 +17,6 @@ public class KafkaMainListener {
     public void listen(ConsumerRecord<String, MyDTO> consumerRecord) {
         log.info("Started consuming message on topic: {}, offset {}, message {}", consumerRecord.topic(),
                 consumerRecord.offset(), consumerRecord.value());
-
         if(consumerRecord.offset() % 2 != 0)
             throw new RuntimeException("This is really odd.");
 
